@@ -1,36 +1,50 @@
-function addToList(e) {
+const itemForm = document.getElementById("item-form");
+const itemInput = document.getElementById("item-input");
+const itemList = document.getElementById("item-list");
+
+function addItem(e) {
   e.preventDefault();
 
-  let itemInput = document.getElementById("item-input");
-  let itemValue = itemInput.value.trim();
+  const newItem = itemInput.value;
 
-  if (itemValue !== "") {
-    let list = document.querySelector("ul");
-    let li = document.createElement("li");
-    li.innerText = itemValue;
+  // Validate Input
+  if (newItem === "") {
+    alert("Please add an item");
+    return;
+  }
 
-    let button = document.createElement("button");
-    button.className = "remove-item btn-link text-red";
-    let icon = document.createElement("i");
-    icon.className = "fa-solid fa-xmark";
+  // Create list item
+  const li = document.createElement("li");
+  li.appendChild(document.createTextNode(newItem));
 
-    button.appendChild(icon);
-    li.appendChild(button);
-    list.appendChild(li);
-    itemInput.value = "";
+  const button = createButton("remove-item btn-link text-red");
+  li.appendChild(button);
+
+  itemList.appendChild(li);
+
+  itemInput.value = "";
+}
+
+function createButton(classes) {
+  const button = document.createElement("button");
+  button.className = classes;
+  const icon = createIcon("fa-solid fa-xmark");
+  button.appendChild(icon);
+  return button;
+}
+
+function createIcon(classes) {
+  const icon = document.createElement("i");
+  icon.className = classes;
+  return icon;
+}
+
+function removeItem(e) {
+  if (e.target.parentElement.classList.contains("remove-item")) {
+    e.target.parentElement.parentElement.remove();
   }
 }
 
-function clearAll(e) {
-  e.preventDefault();
-  let ul = document.querySelector("ul");
-  while (ul.children) {
-    ul.firstChild.remove();
-  }
-}
-
-let addButton = document.querySelector(".btn");
-addButton.addEventListener("click", addToList);
-
-let clearButton = document.querySelector("#clear");
-clearButton.addEventListener("click", clearAll);
+// Event Listeners
+itemForm.addEventListener("submit", addItem);
+itemList.addEventListener("click", removeItem);
