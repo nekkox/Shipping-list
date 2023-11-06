@@ -81,13 +81,32 @@ function getItemsFromStorage(){
   return itemsFromStorage;
 }
 
-function removeItem(e) {
-  if (e.target.parentElement.classList.contains("remove-item")) {
-    if (confirm("Jestes pewien?")) {
-      e.target.parentElement.parentElement.remove();
-    }
+function onClickItem(e){
+  if (e.target.parentElement.classList.contains("remove-item")){
+    removeItem(e.target.parentElement.parentElement);
+  }
+}
+
+function removeItem(item) {
+  if(confirm('Are you sure?')){
+    //Remove item from Dom
+    item.remove();
+
+    //Remove item from storage
+    removeItemFromStorage(item.textContent)
+  
     checkUI();
   }
+}
+
+function removeItemFromStorage(item){
+  let itemsFromStorage = getItemsFromStorage();
+
+  //Filter out item to be removed
+  itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+  //Re-set to global storage
+  localStorage.setItem('items', JSON.stringify(itemsFromStorage))
 }
 
 function clearAllItems(e) {
@@ -96,6 +115,10 @@ function clearAllItems(e) {
   while (ul.firstChild) {
     ul.firstChild.remove();
   }
+
+  //clear from local storage
+  localStorage.removeItem('items');
+
   checkUI();
 }
 
@@ -130,7 +153,7 @@ function filterItems(e) {
 function init(){
   // Event Listeners
 itemForm.addEventListener("submit", onAddItemSubmit);
-itemList.addEventListener("click", removeItem);
+itemList.addEventListener("click", onClickItem);
 clearBtn.addEventListener("click", clearAllItems);
 filter.addEventListener("input", filterItems);
 document.addEventListener("DOMContentLoaded", displayItems)
