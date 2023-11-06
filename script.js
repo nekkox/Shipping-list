@@ -4,8 +4,7 @@ const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const filter = document.getElementById("filter");
 
-
-function addItem(e) {
+function onAddItemSubmit(e) {
   e.preventDefault();
 
   const newItem = itemInput.value;
@@ -16,18 +15,44 @@ function addItem(e) {
     return;
   }
 
-  // Create list item
-  const li = document.createElement("li");
-  li.appendChild(document.createTextNode(newItem));
+  //Create item Dom element
+  addItemToDom(newItem);
 
-  const button = createButton("remove-item btn-link text-red");
-  li.appendChild(button);
-
-  itemList.appendChild(li);
+  //Add item to local storage
+  addItemToStorage(newItem);
 
   checkUI();
 
   itemInput.value = "";
+}
+
+//item is the text from the form
+function addItemToDom(item) {
+  // Create list item
+  const li = document.createElement("li");
+  li.appendChild(document.createTextNode(item));
+
+  const button = createButton("remove-item btn-link text-red");
+  li.appendChild(button);
+
+  //Add li to the Dom
+  itemList.appendChild(li);
+}
+
+function addItemToStorage(item) {
+  let itemsFromStorage;
+  if (localStorage.getItem("items") === null) {
+    itemsFromStorage = [];
+  } else {
+    //Parsing the string items into array
+    itemsFromStorage = JSON.parse(localStorage.getItem("items"));
+  }
+
+  //Add new item to the array
+  itemsFromStorage.push(item);
+
+  //Convert to JSON string and set to local storage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
 }
 
 function createButton(classes) {
@@ -76,23 +101,21 @@ function checkUI() {
 
 function filterItems(e) {
   const items = itemList.querySelectorAll("li");
-const text = e.target.value.toLowerCase();
-console.log(text);
+  const text = e.target.value.toLowerCase();
+  console.log(text);
 
-items.forEach(item => {
- let itemName = item.firstChild.textContent.toLowerCase();
- if(itemName.indexOf(text) != -1){
-  item.style.display = 'flex'
- }else{
-  item.style.display = 'none'
- }
-})
-
-
+  items.forEach((item) => {
+    let itemName = item.firstChild.textContent.toLowerCase();
+    if (itemName.indexOf(text) != -1) {
+      item.style.display = "flex";
+    } else {
+      item.style.display = "none";
+    }
+  });
 }
 
 // Event Listeners
-itemForm.addEventListener("submit", addItem);
+itemForm.addEventListener("submit", onAddItemSubmit);
 itemList.addEventListener("click", removeItem);
 clearBtn.addEventListener("click", clearAllItems);
 filter.addEventListener("input", filterItems);
